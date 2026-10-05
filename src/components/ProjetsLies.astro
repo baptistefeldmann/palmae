@@ -1,0 +1,67 @@
+---
+import type { MetierId } from '../config/site';
+import { afficherProjets, getProjets } from '../lib/projets';
+import CarteProjet from './CarteProjet.astro';
+import { lien } from '../lib/liens';
+
+interface Props {
+	prestation: MetierId;
+	titre?: string;
+}
+
+const { prestation, titre = 'Quelques jardins' } = Astro.props;
+const projets = (await getProjets()).filter((projet) => projet.data.prestations.includes(prestation)).slice(0, 2);
+const lienProjets = await afficherProjets();
+---
+
+{
+	projets.length > 0 && (
+		<section class="section">
+			<div class="conteneur">
+				<div class="lies__entete">
+					<div>
+						<p class="surtitre">Projets</p>
+						<h2 class="lies__titre">{titre}</h2>
+					</div>
+					{lienProjets && (
+						<a class="bouton bouton--contour" href={lien('/projets')}>
+							Tous les projets
+						</a>
+					)}
+				</div>
+				<div class="lies__grille">
+					{projets.map((projet) => (
+						<CarteProjet projet={projet} />
+					))}
+				</div>
+			</div>
+		</section>
+	)
+}
+
+<style>
+	.lies__entete {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: end;
+		gap: var(--e-5);
+	}
+
+	.lies__titre {
+		margin-top: var(--e-4);
+	}
+
+	.lies__grille {
+		display: grid;
+		gap: var(--e-7);
+		margin-top: var(--e-7);
+	}
+
+	@media (min-width: 48rem) {
+		.lies__grille {
+			grid-template-columns: repeat(2, 1fr);
+			column-gap: var(--e-6);
+		}
+	}
+</style>

@@ -1,0 +1,73 @@
+---
+import { Font } from 'astro:assets';
+import { DEMO } from 'astro:env/server';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { site } from '../config/site';
+import '../styles/global.css';
+import { lien } from '../lib/liens';
+
+interface Props {
+	/** Titre de la page, suffixé par le nom du site. Absent sur l'accueil. */
+	titre?: string;
+	description?: string;
+}
+
+const { titre, description = site.description } = Astro.props;
+const titreComplet = titre ? `${titre} | ${site.nom}` : `${site.nom} — Paysagiste à La Réunion`;
+const canonique = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{titreComplet}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonique} />
+		{DEMO && <meta name="robots" content="noindex, nofollow" />}
+
+		<link rel="icon" href={lien('/favicon.ico')} sizes="48x48" />
+		<link rel="icon" href={lien('/favicon-32.png')} type="image/png" sizes="32x32" />
+		<link rel="apple-touch-icon" href={lien('/apple-touch-icon.png')} />
+		<meta name="theme-color" content="#f6f5f1" />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="fr_FR" />
+		<meta property="og:site_name" content={site.nom} />
+		<meta property="og:title" content={titreComplet} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonique} />
+
+		<!-- Seules les graisses visibles au premier affichage sont préchargées -->
+		<Font cssVariable="--font-bodoni" preload={[{ weight: 400, style: 'normal' }]} />
+		<Font cssVariable="--font-jost" preload={[{ weight: 400, style: 'normal' }]} />
+	</head>
+	<body>
+		<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+		{
+			DEMO && (
+				<p class="bandeau-maquette">
+					Maquette de travail : textes, photos et projets sont provisoires.
+				</p>
+			)
+		}
+		<Header />
+		<main id="contenu">
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.bandeau-maquette {
+		padding: var(--e-2) var(--l-gouttiere);
+		background: var(--c-encre);
+		color: var(--c-inverse);
+		font-size: var(--t--1);
+		letter-spacing: 0.04em;
+		text-align: center;
+	}
+</style>

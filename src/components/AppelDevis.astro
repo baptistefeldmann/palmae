@@ -1,0 +1,68 @@
+---
+import { type MetierId, options, site } from '../config/site';
+import { lien } from '../lib/liens';
+
+interface Props {
+	titre?: string;
+	texte?: string;
+	/** Pré-coche la prestation dans le formulaire */
+	prestation?: MetierId;
+}
+
+const {
+	titre = 'Un projet de jardin ?',
+	texte = 'Décrivez-nous votre terrain et vos envies : nous revenons vers vous pour en parler, puis pour une visite sur place.',
+	prestation,
+} = Astro.props;
+
+const adresse = lien(prestation ? `/devis?prestation=${prestation}` : '/devis');
+const { telephone } = site.contact;
+---
+
+<section class="appel theme-sombre">
+	<div class="conteneur appel__contenu">
+		<h2>{titre}</h2>
+		<div class="appel__texte">
+			<p class="chapeau">{texte}</p>
+			<div class="appel__actions">
+				<a class="bouton" href={adresse}>{options.devisGratuit ? 'Demander un devis gratuit' : 'Demander un devis'}</a>
+				<a class="bouton bouton--contour" href={`tel:${telephone.lien}`}>{telephone.affichage}</a>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.appel {
+		padding-block: var(--e-section);
+		border-bottom: 1px solid var(--c-trait-inverse);
+	}
+
+	.appel__contenu {
+		display: grid;
+		gap: var(--e-6);
+	}
+
+	.appel h2 {
+		max-width: 14ch;
+	}
+
+	.appel__texte {
+		display: grid;
+		gap: var(--e-6);
+		align-content: end;
+	}
+
+	.appel__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--e-3);
+	}
+
+	@media (min-width: 64rem) {
+		.appel__contenu {
+			grid-template-columns: 1.2fr 1fr;
+			column-gap: var(--e-8);
+		}
+	}
+</style>

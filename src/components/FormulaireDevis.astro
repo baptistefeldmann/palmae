@@ -1,0 +1,629 @@
+---
+/**
+ * Formulaire de devis en 3 étapes.
+ * Sans JavaScript : un seul formulaire, validé par le navigateur.
+ * Avec JavaScript : affichage étape par étape, pré-remplissage via `?prestation=`, envoi en `fetch`.
+ */
+import { COMMUNES } from '../config/communes';
+import { metiers, site } from '../config/site';
+import { lien } from '../lib/liens';
+
+const endpoint = site.formulaire.endpoint;
+const etapes = ['Le projet', 'Le terrain', 'Vos coordonnées'];
+
+const typesClient = ['Particulier', 'Professionnel', 'Copropriété'];
+const surfaces = ['Moins de 100 m²', '100 à 300 m²', '300 à 1 000 m²', 'Plus de 1 000 m²', 'Je ne sais pas'];
+const budgets = ['Moins de 5 000 €', '5 000 à 15 000 €', '15 000 à 30 000 €', 'Plus de 30 000 €', 'À définir ensemble'];
+const echeances = ['Dès que possible', 'Dans les 3 mois', "Dans l'année", 'Pas de date précise'];
+const creneaux = ['Le matin', 'Entre midi et deux', "L'après-midi", 'Indifférent'];
+
+// Numéros français et réunionnais : 0692 12 34 56, +262 692 12 34 56, 06 12 34 56 78…
+const motifTelephone = String.raw`(?:(?:\+|00)(?:33|262)\s?|0)[1-9](?:(?:\s|\.|-)?\d{2}){4}`;
+---
+
+<form
+	id="formulaire-devis"
+	class="devis"
+	method="post"
+	action={endpoint ?? undefined}
+	enctype="multipart/form-data"
+	data-endpoint={endpoint ?? ''}
+	data-merci={lien('/devis/merci')}
+>
+	<ol class="devis__progression" aria-hidden="true">
+		{etapes.map((etape, i) => <li><span>{i + 1}</span>{etape}</li>)}
+	</ol>
+
+	<!-- Étape 1 -->
+	<fieldset class="devis__etape">
+		<legend class="devis__legende" tabindex="-1">
+			<span class="devis__compteur">Étape 1 sur 3</span>
+			{etapes[0]}
+		</legend>
+
+		<fieldset class="champ">
+			<legend class="champ__libelle">Prestations souhaitées</legend>
+			<p class="champ__aide">Plusieurs choix possibles.</p>
+			<div class="tuiles">
+				{
+					metiers.map((metier) => (
+						<label class="tuile">
+							<input type="checkbox" name="prestations" value={metier.id} />
+							<span class="tuile__titre">{metier.titre}</span>
+							<span class="tuile__texte">{metier.resume}</span>
+						</label>
+					))
+				}
+			</div>
+		</fieldset>
+
+		<fieldset class="champ">
+			<legend class="champ__libelle">Vous êtes</legend>
+			<div class="tuiles tuiles--compactes">
+				{
+					typesClient.map((type) => (
+						<label class="tuile">
+							<input type="radio" name="type_client" value={type} required />
+							<span class="tuile__titre">{type}</span>
+						</label>
+					))
+				}
+			</div>
+		</fieldset>
+
+		<div class="champ">
+			<label class="champ__libelle" for="devis-description">Votre projet</label>
+			<p class="champ__aide" id="devis-description-aide">
+				Vos envies, l'état actuel du terrain, les plantes que vous aimez, les contraintes à connaître…
+			</p>
+			<textarea
+				id="devis-description"
+				name="description"
+				rows="6"
+				minlength="20"
+				required
+				aria-describedby="devis-description-aide"></textarea>
+		</div>
+
+		<div class="devis__navigation">
+			<button type="button" class="bouton" data-suivant>Continuer</button>
+		</div>
+	</fieldset>
+
+	<!-- Étape 2 -->
+	<fieldset class="devis__etape">
+		<legend class="devis__legende" tabindex="-1">
+			<span class="devis__compteur">Étape 2 sur 3</span>
+			{etapes[1]}
+		</legend>
+
+		<div class="champ">
+			<label class="champ__libelle" for="devis-commune">Commune</label>
+			<select id="devis-commune" name="commune" required>
+				<option value="">Choisir une commune</option>
+				{COMMUNES.map((commune) => <option>{commune}</option>)}
+			</select>
+		</div>
+
+		<div class="champs-duo">
+			<div class="champ">
+				<label class="champ__libelle" for="devis-surface">
+					Surface du jardin <span class="champ__facultatif">(facultatif)</span>
+				</label>
+				<select id="devis-surface" name="surface">
+					<option value="">Choisir</option>
+					{surfaces.map((surface) => <option>{surface}</option>)}
+				</select>
+			</div>
+
+			<div class="champ">
+				<label class="champ__libelle" for="devis-budget">
+					Budget envisagé <span class="champ__facultatif">(facultatif)</span>
+				</label>
+				<select id="devis-budget" name="budget">
+					<option value="">Choisir</option>
+					{budgets.map((budget) => <option>{budget}</option>)}
+				</select>
+			</div>
+		</div>
+
+		<div class="champ">
+			<label class="champ__libelle" for="devis-echeance">
+				Échéance souhaitée <span class="champ__facultatif">(facultatif)</span>
+			</label>
+			<select id="devis-echeance" name="echeance">
+				<option value="">Choisir</option>
+				{echeances.map((echeance) => <option>{echeance}</option>)}
+			</select>
+		</div>
+
+		<div class="champ">
+			<label class="champ__libelle" for="devis-photos">
+				Photos du terrain <span class="champ__facultatif">(facultatif)</span>
+			</label>
+			<p class="champ__aide" id="devis-photos-aide">Jusqu'à 5 photos, 10 Mo maximum chacune.</p>
+			<input
+				id="devis-photos"
+				name="photos"
+				type="file"
+				accept="image/*"
+				multiple
+				aria-describedby="devis-photos-aide"
+			/>
+		</div>
+
+		<div class="devis__navigation">
+			<button type="button" class="bouton bouton--contour" data-precedent>Retour</button>
+			<button type="button" class="bouton" data-suivant>Continuer</button>
+		</div>
+	</fieldset>
+
+	<!-- Étape 3 -->
+	<fieldset class="devis__etape">
+		<legend class="devis__legende" tabindex="-1">
+			<span class="devis__compteur">Étape 3 sur 3</span>
+			{etapes[2]}
+		</legend>
+
+		<div class="champ">
+			<label class="champ__libelle" for="devis-nom">Nom et prénom</label>
+			<input id="devis-nom" name="nom" type="text" autocomplete="name" required />
+		</div>
+
+		<div class="champs-duo">
+			<div class="champ">
+				<label class="champ__libelle" for="devis-email">Adresse e-mail</label>
+				<input id="devis-email" name="email" type="email" autocomplete="email" required />
+			</div>
+
+			<div class="champ">
+				<label class="champ__libelle" for="devis-telephone">Téléphone</label>
+				<input
+					id="devis-telephone"
+					name="telephone"
+					type="tel"
+					autocomplete="tel"
+					pattern={motifTelephone}
+					title="Un numéro de téléphone français, par exemple 0692 12 34 56"
+					required
+				/>
+			</div>
+		</div>
+
+		<div class="champ">
+			<label class="champ__libelle" for="devis-creneau">
+				Quand vous rappeler ? <span class="champ__facultatif">(facultatif)</span>
+			</label>
+			<select id="devis-creneau" name="creneau">
+				<option value="">Choisir</option>
+				{creneaux.map((creneau) => <option>{creneau}</option>)}
+			</select>
+		</div>
+
+		<!-- Champ piège pour les robots : invisible pour les visiteurs -->
+		<div class="visuellement-cache" aria-hidden="true">
+			<label for="devis-site">Ne pas remplir ce champ</label>
+			<input id="devis-site" name="site_web" type="text" tabindex="-1" autocomplete="off" />
+		</div>
+
+		<label class="consentement">
+			<input type="checkbox" name="consentement" required />
+			<span>
+				J'accepte que ces informations soient utilisées pour traiter ma demande de devis. Voir la{' '}
+				<a href={lien('/confidentialite')}>politique de confidentialité</a>.
+			</span>
+		</label>
+
+		<div class="devis__navigation">
+			<button type="button" class="bouton bouton--contour" data-precedent>Retour</button>
+			<button type="submit" class="bouton" data-envoyer>Envoyer ma demande</button>
+		</div>
+	</fieldset>
+
+	<p class="devis__message" role="status" aria-live="polite"></p>
+</form>
+
+<script>
+	const form = document.querySelector<HTMLFormElement>('#formulaire-devis');
+
+	if (form) {
+		const etapes = [...form.querySelectorAll<HTMLFieldSetElement>(':scope > .devis__etape')];
+		const reperes = [...form.querySelectorAll<HTMLLIElement>('.devis__progression li')];
+		const message = form.querySelector<HTMLElement>('.devis__message')!;
+		const envoyer = form.querySelector<HTMLButtonElement>('[data-envoyer]')!;
+		const prestations = [...form.querySelectorAll<HTMLInputElement>('input[name="prestations"]')];
+		const photos = form.querySelector<HTMLInputElement>('input[name="photos"]')!;
+		let courante = 0;
+
+		// La validation est faite étape par étape : le navigateur ne peut pas signaler un champ masqué
+		form.noValidate = true;
+		form.classList.add('est-pas-a-pas');
+
+		// Pré-coche la prestation demandée depuis une page métier ou un projet (/devis?prestation=entretien)
+		const demandee = new URLSearchParams(location.search).get('prestation');
+		for (const case_ of prestations) case_.checked ||= case_.value === demandee;
+
+		// « Au moins une prestation » : règle portée par la première case du groupe
+		function verifierRegles() {
+			const aucune = !prestations.some((case_) => case_.checked);
+			prestations[0].setCustomValidity(aucune ? 'Choisissez au moins une prestation.' : '');
+
+			const fichiers = [...(photos.files ?? [])];
+			const tropLourd = fichiers.some((fichier) => fichier.size > 10 * 1024 * 1024);
+			photos.setCustomValidity(
+				fichiers.length > 5 ? 'Cinq photos au maximum.' : tropLourd ? 'Chaque photo doit faire moins de 10 Mo.' : '',
+			);
+		}
+
+		function premierChampInvalide(etape: HTMLFieldSetElement) {
+			verifierRegles();
+			return [...etape.querySelectorAll<HTMLInputElement>('input, select, textarea')].find(
+				(champ) => !champ.checkValidity(),
+			);
+		}
+
+		function afficher(index: number, focus = true) {
+			courante = index;
+			etapes.forEach((etape, i) => (etape.hidden = i !== index));
+			reperes.forEach((repere, i) => {
+				repere.classList.toggle('est-courante', i === index);
+				repere.classList.toggle('est-faite', i < index);
+			});
+			if (focus) {
+				form!.scrollIntoView({ block: 'start' });
+				etapes[index].querySelector<HTMLElement>('.devis__legende')?.focus({ preventScroll: true });
+			}
+		}
+
+		form.addEventListener('click', (evenement) => {
+			const bouton = (evenement.target as HTMLElement).closest('button');
+			if (bouton?.hasAttribute('data-precedent')) afficher(courante - 1);
+			if (bouton?.hasAttribute('data-suivant')) {
+				const invalide = premierChampInvalide(etapes[courante]);
+				if (invalide) invalide.reportValidity();
+				else afficher(courante + 1);
+			}
+		});
+
+		form.addEventListener('submit', async (evenement) => {
+			evenement.preventDefault();
+			message.textContent = '';
+
+			for (const [i, etape] of etapes.entries()) {
+				const invalide = premierChampInvalide(etape);
+				if (invalide) {
+					if (i !== courante) afficher(i, false);
+					invalide.reportValidity();
+					return;
+				}
+			}
+
+			const adresse = form.dataset.endpoint;
+			if (!adresse) {
+				message.textContent =
+					"L'envoi n'est pas encore branché : le formulaire sera relié à un service d'envoi lors de la mise en ligne.";
+				return;
+			}
+
+			envoyer.disabled = true;
+			envoyer.textContent = 'Envoi en cours…';
+			try {
+				const reponse = await fetch(adresse, { method: 'POST', body: new FormData(form) });
+				if (!reponse.ok) throw new Error(`HTTP ${reponse.status}`);
+				location.href = form.dataset.merci!;
+			} catch {
+				message.textContent = "L'envoi a échoué. Réessayez dans un instant, ou appelez-nous directement.";
+				envoyer.disabled = false;
+				envoyer.textContent = 'Envoyer ma demande';
+			}
+		});
+
+		afficher(0, false);
+	}
+</script>
+
+<style>
+	.devis {
+		display: grid;
+		gap: var(--e-6);
+	}
+
+	/* ---------- Progression (affichée seulement en mode étapes) ---------- */
+
+	.devis__progression {
+		display: none;
+		gap: var(--e-2);
+		padding: 0;
+		list-style: none;
+		font-size: var(--t--1);
+		color: var(--c-encre-douce);
+	}
+
+	.est-pas-a-pas .devis__progression {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.devis__progression li {
+		display: flex;
+		align-items: center;
+		gap: var(--e-2);
+		padding-top: var(--e-3);
+		border-top: 2px solid var(--c-trait);
+	}
+
+	.devis__progression span {
+		display: grid;
+		place-items: center;
+		flex-shrink: 0;
+		width: 1.5rem;
+		height: 1.5rem;
+		border: 1px solid currentColor;
+		border-radius: 50%;
+		font-size: 0.75rem;
+	}
+
+	.devis__progression .est-courante,
+	.devis__progression .est-faite {
+		border-color: var(--c-encre);
+		color: var(--c-encre);
+	}
+
+	.devis__progression .est-courante span,
+	.devis__progression .est-faite span {
+		background: var(--c-encre);
+		color: var(--c-fond);
+	}
+
+	@media (max-width: 30rem) {
+		.devis__progression li {
+			font-size: 0;
+		}
+
+		.devis__progression span {
+			font-size: 0.75rem;
+		}
+	}
+
+	/* ---------- Étapes ---------- */
+
+	fieldset {
+		min-width: 0;
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+
+	.devis__etape {
+		display: grid;
+		gap: var(--e-6);
+	}
+
+	.devis__etape[hidden] {
+		display: none;
+	}
+
+	.devis__etape + .devis__etape {
+		padding-top: var(--e-7);
+		border-top: 1px solid var(--c-trait);
+	}
+
+	.est-pas-a-pas .devis__etape + .devis__etape {
+		padding-top: 0;
+		border-top: 0;
+	}
+
+	/* La légende d'un fieldset n'est pas un élément de grille : l'espace se règle par la marge */
+	.devis__legende {
+		display: grid;
+		gap: var(--e-2);
+		margin-bottom: var(--e-6);
+		font-family: var(--f-titre);
+		font-size: var(--t-3);
+		line-height: 1.1;
+	}
+
+	.devis__legende:focus {
+		outline: none;
+	}
+
+	.devis__compteur {
+		font-family: var(--f-texte);
+		font-size: var(--t--1);
+		font-weight: 500;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--c-encre-douce);
+	}
+
+	.devis__navigation {
+		display: none;
+		justify-content: space-between;
+		gap: var(--e-3);
+	}
+
+	.devis__navigation:has(> :only-child) {
+		justify-content: end;
+	}
+
+	.est-pas-a-pas .devis__navigation {
+		display: flex;
+	}
+
+	/* Sans JavaScript, seul le bouton d'envoi reste */
+	.devis:not(.est-pas-a-pas) .devis__etape:last-of-type .devis__navigation {
+		display: flex;
+		justify-content: end;
+	}
+
+	.devis:not(.est-pas-a-pas) [data-precedent],
+	.devis:not(.est-pas-a-pas) [data-suivant] {
+		display: none;
+	}
+
+	/* ---------- Champs ---------- */
+
+	.champ {
+		display: grid;
+		gap: var(--e-2);
+	}
+
+	.champ__libelle {
+		font-weight: 500;
+	}
+
+	legend.champ__libelle {
+		margin-bottom: var(--e-2);
+	}
+
+	.champ__facultatif,
+	.champ__aide {
+		font-size: var(--t--1);
+		font-weight: 400;
+		color: var(--c-encre-douce);
+	}
+
+	.champ__aide {
+		margin-top: calc(-1 * var(--e-1));
+	}
+
+	input:where([type='text'], [type='email'], [type='tel'], [type='file']),
+	select,
+	textarea {
+		width: 100%;
+		min-height: 3rem;
+		padding: var(--e-3) var(--e-4);
+		border: 1px solid var(--c-trait);
+		border-radius: 0;
+		background: var(--c-champ);
+		transition: border-color var(--transition);
+	}
+
+	textarea {
+		resize: vertical;
+	}
+
+	select {
+		appearance: none;
+		padding-right: var(--e-7);
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23111' stroke-width='1.5'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+		background-position: right var(--e-4) center;
+		background-repeat: no-repeat;
+	}
+
+	input:hover,
+	select:hover,
+	textarea:hover {
+		border-color: var(--c-encre-douce);
+	}
+
+	input:focus-visible,
+	select:focus-visible,
+	textarea:focus-visible {
+		border-color: var(--c-encre);
+		outline: 1px solid var(--c-encre);
+		outline-offset: 0;
+	}
+
+	input:user-invalid,
+	select:user-invalid,
+	textarea:user-invalid {
+		border-color: var(--c-erreur);
+	}
+
+	.champs-duo {
+		display: grid;
+		gap: var(--e-6) var(--e-5);
+	}
+
+	@media (min-width: 40rem) {
+		.champs-duo {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	/* ---------- Choix en tuiles ---------- */
+
+	.tuiles {
+		display: grid;
+		gap: var(--e-3);
+		margin-top: var(--e-2);
+	}
+
+	@media (min-width: 40rem) {
+		.tuiles {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	.tuile {
+		position: relative;
+		display: grid;
+		gap: var(--e-1);
+		align-content: start;
+		padding: var(--e-4);
+		border: 1px solid var(--c-trait);
+		background: var(--c-champ);
+		cursor: pointer;
+		transition: border-color var(--transition);
+	}
+
+	.tuile:hover {
+		border-color: var(--c-encre-douce);
+	}
+
+	.tuile:has(input:checked) {
+		border-color: var(--c-encre);
+		box-shadow: inset 0 0 0 1px var(--c-encre);
+	}
+
+	.tuile:has(input:focus-visible) {
+		outline: 2px solid var(--c-encre);
+		outline-offset: 2px;
+	}
+
+	.tuile input {
+		position: absolute;
+		top: var(--e-4);
+		right: var(--e-4);
+		accent-color: var(--c-encre);
+	}
+
+	.tuile__titre {
+		padding-right: var(--e-6);
+		font-family: var(--f-titre);
+		font-size: var(--t-1);
+		line-height: 1.2;
+	}
+
+	.tuile__texte {
+		font-size: var(--t--1);
+		color: var(--c-encre-douce);
+	}
+
+	.consentement {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: var(--e-3);
+		align-items: start;
+		font-size: var(--t--1);
+		color: var(--c-encre-douce);
+	}
+
+	.consentement input {
+		width: 1.125rem;
+		height: 1.125rem;
+		margin-top: 0.2em;
+		accent-color: var(--c-encre);
+	}
+
+	.devis__message:empty {
+		display: none;
+	}
+
+	.devis__message {
+		padding: var(--e-4);
+		border-left: 2px solid var(--c-encre);
+		background: var(--c-fond-alt);
+	}
+</style>

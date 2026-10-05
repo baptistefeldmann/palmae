@@ -1,0 +1,92 @@
+---
+import AppelDevis from '../components/AppelDevis.astro';
+import AvantApres from '../components/AvantApres.astro';
+import EnTetePage from '../components/EnTetePage.astro';
+import Etapes from '../components/Etapes.astro';
+import Faq from '../components/Faq.astro';
+import Introduction from '../components/Introduction.astro';
+import ListePrestations from '../components/ListePrestations.astro';
+import ProjetsLies from '../components/ProjetsLies.astro';
+import photo from '../assets/photos/realisation.jpg';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { lorem } from '../lib/lorem';
+import { getProjets } from '../lib/projets';
+import { lien } from '../lib/liens';
+
+// Contenus provisoires : titres réels, textes en lorem ipsum
+const prestations = [
+	{ titre: 'Terrassement et préparation des sols', texte: lorem(2, 1) },
+	{ titre: 'Maçonnerie paysagère', texte: lorem(2, 3) },
+	{ titre: 'Allées et terrasses', texte: lorem(2, 5) },
+	{ titre: 'Plantations', texte: lorem(2, 7) },
+	{ titre: 'Arrosage et récupération des eaux de pluie', texte: lorem(2, 9) },
+	{ titre: 'Bassins', texte: lorem(2, 11) },
+];
+
+const etapes = [
+	{ titre: 'Préparation du chantier', texte: lorem(2, 0) },
+	{ titre: 'Gros œuvre paysager', texte: lorem(2, 2) },
+	{ titre: 'Plantations', texte: lorem(2, 4) },
+	{ titre: 'Réception', texte: lorem(2, 6) },
+];
+
+const questions = [
+	{ question: 'Quelle est la meilleure saison pour planter ?', reponse: lorem(3, 1) },
+	{ question: 'Faut-il une autorisation pour les travaux ?', reponse: lorem(3, 4) },
+	{ question: 'Travaillez-vous à partir du plan d’un autre paysagiste ?', reponse: lorem(3, 7) },
+];
+
+// Le premier projet de réalisation qui a des photos avant/après
+const exemple = (await getProjets()).find(
+	(projet) => projet.data.prestations.includes('realisation') && projet.data.avantApres.length > 0,
+);
+---
+
+<BaseLayout
+	titre="Réalisation de jardins"
+	description="Terrassement, maçonnerie paysagère, allées, plantations et arrosage : la création de votre jardin à La Réunion."
+>
+	<EnTetePage
+		surtitre="Réalisation"
+		titre="Donner vie au <em>projet</em>"
+		chapeau={lorem(2, 2)}
+		image={photo}
+		imageAlt="Mains qui préparent la terre avant une plantation"
+	/>
+
+	<Introduction accroche={lorem(2, 6)} paragraphes={[lorem(4, 2), lorem(4, 7)]} />
+
+	{
+		exemple && (
+			<section class="section section--alt">
+				<div class="conteneur">
+					<p class="surtitre">Avant, après</p>
+					<h2 class="exemple__titre">
+						<a href={lien(`/projets/${exemple.id}`)}>{exemple.data.titre}</a>
+					</h2>
+					<AvantApres nom={exemple.data.titre} {...exemple.data.avantApres[0]} />
+				</div>
+			</section>
+		)
+	}
+
+	<ListePrestations surtitre="Le chantier" titre="Ce que nous réalisons" elements={prestations} />
+	<Etapes titre="Du premier coup de pelle à la réception" etapes={etapes} />
+	<ProjetsLies prestation="realisation" titre="Jardins réalisés par Palmæ" />
+	<Faq questions={questions} />
+	<AppelDevis prestation="realisation" titre="Passons du plan au jardin" />
+</BaseLayout>
+
+<style>
+	.exemple__titre {
+		margin-block: var(--e-4) var(--e-7);
+	}
+
+	.exemple__titre a {
+		text-decoration: none;
+	}
+
+	.exemple__titre a:hover {
+		font-style: italic;
+	}
+</style>

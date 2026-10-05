@@ -1,0 +1,66 @@
+---
+// Accueil provisoire : sert à valider le socle (typographies, boutons, en-tête, pied de page).
+// Remplacé à l'étape 2 par la vraie page d'accueil (voir ARCHITECTURE.md §2).
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { metiers, site } from '../config/site';
+import { lien } from '../lib/liens';
+---
+
+<BaseLayout>
+	<section class="section">
+		<div class="conteneur conteneur-texte accueil">
+			<p class="surtitre">{site.accroche}</p>
+			<h1>Des jardins pensés pour <em>La Réunion</em></h1>
+			<p class="chapeau">
+				Conception, réalisation et entretien de jardins, sur toute l'île. Texte provisoire.
+			</p>
+			<div class="accueil__actions">
+				<a class="bouton" href={lien('/devis')}>Demander un devis</a>
+				<a class="bouton bouton--contour" href={lien('/conception')}>Découvrir nos métiers</a>
+			</div>
+		</div>
+	</section>
+
+	<section class="section section--alt">
+		<div class="conteneur metiers">
+			{
+				metiers.map((metier) => (
+					<article>
+						<h2>{metier.titre}</h2>
+						<p>{metier.resume}</p>
+					</article>
+				))
+			}
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.accueil {
+		display: grid;
+		gap: var(--e-5);
+	}
+
+	.accueil__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--e-3);
+		margin-top: var(--e-4);
+	}
+
+	.metiers {
+		display: grid;
+		gap: var(--e-7);
+	}
+
+	.metiers h2 {
+		margin-bottom: var(--e-3);
+		font-size: var(--t-3);
+	}
+
+	@media (min-width: 48rem) {
+		.metiers {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+</style>

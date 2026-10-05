@@ -1,0 +1,72 @@
+---
+interface Props {
+	titre: string;
+	etapes: { titre: string; texte: string }[];
+}
+
+const { titre, etapes } = Astro.props;
+---
+
+<section class="section section--alt">
+	<div class="conteneur">
+		<p class="surtitre">Déroulé</p>
+		<h2 class="etapes__titre">{titre}</h2>
+		<ol class="etapes">
+			{
+				etapes.map((etape, i) => (
+					<li>
+						<span class="etapes__numero" aria-hidden="true">
+							{i + 1}
+						</span>
+						<h3>{etape.titre}</h3>
+						<p>{etape.texte}</p>
+					</li>
+				))
+			}
+		</ol>
+	</div>
+</section>
+
+<style>
+	.etapes__titre {
+		margin-top: var(--e-4);
+		max-width: 20ch;
+	}
+
+	.etapes {
+		display: grid;
+		gap: var(--e-7);
+		margin-top: var(--e-8);
+		padding: 0;
+		list-style: none;
+	}
+
+	.etapes li {
+		display: grid;
+		gap: var(--e-3);
+		align-content: start;
+	}
+
+	.etapes__numero {
+		font-family: var(--f-titre);
+		font-size: var(--t-5);
+		font-style: italic;
+		line-height: 1;
+	}
+
+	.etapes p {
+		color: var(--c-encre-douce);
+	}
+
+	@media (min-width: 48rem) {
+		.etapes {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.etapes {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+</style>

@@ -1,0 +1,134 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+	avant: ImageMetadata;
+	apres: ImageMetadata;
+	legende?: string;
+	/** Nom du jardin, pour les textes alternatifs */
+	nom: string;
+}
+
+const { avant, apres, legende, nom } = Astro.props;
+// Les deux photos sont recadrées au même format pour se superposer exactement
+const format = { width: 1200, height: 800, sizes: '(min-width: 80rem) 80rem, 100vw' };
+---
+
+<figure class="avant-apres">
+	<div class="avant-apres__cadre">
+		<Image src={apres} alt={`${nom}, après les travaux`} {...format} class="avant-apres__photo" />
+		<div class="avant-apres__avant">
+			<Image src={avant} alt={`${nom}, avant les travaux`} {...format} class="avant-apres__photo" />
+		</div>
+		<span class="surtitre avant-apres__etiquette avant-apres__etiquette--avant" aria-hidden="true">Avant</span>
+		<span class="surtitre avant-apres__etiquette avant-apres__etiquette--apres" aria-hidden="true">Après</span>
+		<div class="avant-apres__poignee" aria-hidden="true"></div>
+		<input
+			class="avant-apres__curseur"
+			type="range"
+			min="0"
+			max="100"
+			value="50"
+			aria-label="Faire glisser pour comparer avant et après"
+		/>
+	</div>
+	{legende && <figcaption>{legende}</figcaption>}
+</figure>
+
+<script>
+	for (const curseur of document.querySelectorAll<HTMLInputElement>('.avant-apres__curseur')) {
+		const cadre = curseur.closest<HTMLElement>('.avant-apres__cadre');
+		curseur.addEventListener('input', () => cadre?.style.setProperty('--position', `${curseur.value}%`));
+	}
+</script>
+
+<style>
+	.avant-apres__cadre {
+		--position: 50%;
+		position: relative;
+		overflow: hidden;
+		aspect-ratio: 3 / 2;
+		background: var(--c-fond-alt);
+	}
+
+	.avant-apres__photo {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.avant-apres__avant {
+		position: absolute;
+		inset: 0;
+		clip-path: inset(0 calc(100% - var(--position)) 0 0);
+	}
+
+	.avant-apres__etiquette {
+		position: absolute;
+		top: var(--e-4);
+		padding: var(--e-1) var(--e-3);
+		background: var(--c-fond);
+		pointer-events: none;
+	}
+
+	.avant-apres__etiquette--avant {
+		left: var(--e-4);
+	}
+
+	.avant-apres__etiquette--apres {
+		right: var(--e-4);
+	}
+
+	.avant-apres__poignee {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: var(--position);
+		width: 2px;
+		background: var(--c-fond);
+		transform: translateX(-50%);
+		pointer-events: none;
+	}
+
+	.avant-apres__poignee::after {
+		content: '‹ ›';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		display: grid;
+		place-items: center;
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		background: var(--c-fond);
+		color: var(--c-encre);
+		font-size: var(--t-1);
+		letter-spacing: 0.1em;
+		transform: translate(-50%, -50%);
+	}
+
+	/* Le curseur natif couvre toute l'image : glisser n'importe où, clavier compris */
+	.avant-apres__curseur {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		opacity: 0;
+		cursor: ew-resize;
+	}
+
+	.avant-apres__cadre:has(.avant-apres__curseur:focus-visible) .avant-apres__poignee::after {
+		outline: 2px solid var(--c-encre);
+		outline-offset: 3px;
+	}
+
+	figcaption {
+		margin-top: var(--e-3);
+		font-size: var(--t--1);
+		color: var(--c-encre-douce);
+	}
+</style>

@@ -1,0 +1,159 @@
+---
+import FormulaireDevis from '../../components/FormulaireDevis.astro';
+import { options, site } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const deroule = [
+	{
+		titre: 'Vous décrivez votre projet',
+		texte: "Le lieu, la surface, vos envies, et quelques photos si vous en avez : l'essentiel pour comprendre votre jardin.",
+	},
+	{
+		titre: 'Nous vous rappelons',
+		texte: 'Sous 48 heures ouvrées, pour faire connaissance et préciser ensemble votre demande.',
+	},
+	{
+		titre: 'Nous venons sur place',
+		texte: "Une visite du terrain, puis une proposition détaillée, adaptée au lieu et à votre budget.",
+	},
+];
+const { telephone, email } = site.contact;
+---
+
+<BaseLayout
+	titre="Demander un devis"
+	description="Décrivez votre projet de jardin à La Réunion : conception, réalisation ou entretien. Palmæ vous recontacte rapidement."
+>
+	<div class="conteneur page-devis">
+		<div class="page-devis__intro">
+			<p class="surtitre">Demande de devis</p>
+			<h1>Parlons de votre <em>jardin</em></h1>
+			<p class="chapeau">
+				Quelques questions pour comprendre votre terrain et vos envies. Comptez cinq minutes : plus votre
+				description est précise, plus notre première réponse le sera aussi.
+			</p>
+			{options.devisGratuit && <p class="page-devis__gratuit">Le devis est gratuit et sans engagement.</p>}
+
+			<ol class="page-devis__deroule">
+				{
+					deroule.map((etape) => (
+						<li>
+							<h2>{etape.titre}</h2>
+							<p>{etape.texte}</p>
+						</li>
+					))
+				}
+			</ol>
+
+			<div class="page-devis__contact">
+				<p class="surtitre">Vous préférez nous appeler ?</p>
+				<a href={`tel:${telephone.lien}`}>{telephone.affichage}</a>
+				<a href={`mailto:${email}`}>{email}</a>
+				<p>{site.zone}</p>
+			</div>
+		</div>
+
+		<div class="page-devis__formulaire">
+			<FormulaireDevis />
+		</div>
+	</div>
+</BaseLayout>
+
+<style>
+	.page-devis {
+		display: grid;
+		gap: var(--e-8);
+		padding-block: var(--e-8) var(--e-section);
+	}
+
+	.page-devis__intro {
+		display: grid;
+		gap: var(--e-5);
+		align-content: start;
+	}
+
+	.page-devis__gratuit {
+		font-weight: 500;
+	}
+
+	.page-devis__deroule {
+		display: grid;
+		gap: var(--e-5);
+		margin-top: var(--e-4);
+		padding: 0;
+		list-style: none;
+		counter-reset: deroule;
+	}
+
+	.page-devis__deroule li {
+		display: grid;
+		grid-template-columns: 2.5rem 1fr;
+		column-gap: var(--e-3);
+		counter-increment: deroule;
+	}
+
+	.page-devis__deroule li::before {
+		content: counter(deroule);
+		grid-row: span 2;
+		font-family: var(--f-titre);
+		font-size: var(--t-3);
+		font-style: italic;
+		line-height: 1;
+	}
+
+	.page-devis__deroule h2 {
+		font-family: var(--f-texte);
+		font-size: var(--t-0);
+		font-weight: 500;
+		line-height: 1.4;
+	}
+
+	.page-devis__deroule p {
+		font-size: var(--t--1);
+		color: var(--c-encre-douce);
+	}
+
+	.page-devis__contact {
+		display: grid;
+		gap: var(--e-1);
+		margin-top: var(--e-4);
+		padding-top: var(--e-5);
+		border-top: 1px solid var(--c-trait);
+	}
+
+	.page-devis__contact .surtitre {
+		margin-bottom: var(--e-2);
+	}
+
+	.page-devis__contact a {
+		font-family: var(--f-titre);
+		font-size: var(--t-1);
+		text-decoration: none;
+	}
+
+	.page-devis__contact a:hover {
+		text-decoration: underline;
+	}
+
+	.page-devis__contact p:last-child {
+		font-size: var(--t--1);
+		color: var(--c-encre-douce);
+	}
+
+	@media (min-width: 64rem) {
+		.page-devis {
+			grid-template-columns: 1fr 1.5fr;
+			column-gap: var(--e-9);
+		}
+
+		.page-devis__intro {
+			position: sticky;
+			top: calc(var(--hauteur-entete) + var(--e-6));
+			align-self: start;
+		}
+
+		.page-devis h1 {
+			font-size: var(--t-4);
+		}
+	}
+</style>

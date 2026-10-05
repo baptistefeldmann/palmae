@@ -1,0 +1,86 @@
+---
+interface Props {
+	surtitre?: string;
+	titre: string;
+	elements: { titre: string; texte: string }[];
+}
+
+const { surtitre, titre, elements } = Astro.props;
+---
+
+<section class="section">
+	<div class="conteneur prestations">
+		<div class="prestations__entete">
+			{surtitre && <p class="surtitre">{surtitre}</p>}
+			<h2>{titre}</h2>
+		</div>
+		<ul class="prestations__liste">
+			{
+				elements.map((element, i) => (
+					<li>
+						<span class="prestations__numero">{String(i + 1).padStart(2, '0')}</span>
+						<h3>{element.titre}</h3>
+						<p>{element.texte}</p>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.prestations {
+		display: grid;
+		gap: var(--e-7);
+	}
+
+	.prestations__entete {
+		display: grid;
+		gap: var(--e-4);
+	}
+
+	.prestations__liste {
+		display: grid;
+		gap: var(--e-6) var(--e-7);
+		padding: 0;
+		list-style: none;
+	}
+
+	.prestations__liste li {
+		display: grid;
+		gap: var(--e-3);
+		align-content: start;
+		padding-top: var(--e-5);
+		border-top: 1px solid var(--c-trait);
+	}
+
+	.prestations__numero {
+		font-family: var(--f-titre);
+		font-size: var(--t-1);
+		font-style: italic;
+		color: var(--c-encre-douce);
+	}
+
+	.prestations__liste p {
+		color: var(--c-encre-douce);
+	}
+
+	@media (min-width: 40rem) {
+		.prestations__liste {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.prestations {
+			grid-template-columns: 1fr 2fr;
+			column-gap: var(--e-8);
+		}
+
+		.prestations__entete {
+			align-content: start;
+			position: sticky;
+			top: calc(var(--hauteur-entete) + var(--e-6));
+		}
+	}
+</style>

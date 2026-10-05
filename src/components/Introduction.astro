@@ -1,0 +1,45 @@
+---
+interface Props {
+	/** Phrase mise en avant, en grand caractère */
+	accroche: string;
+	paragraphes: string[];
+}
+
+const { accroche, paragraphes } = Astro.props;
+---
+
+<section class="section">
+	<div class="conteneur intro">
+		<p class="intro__accroche">{accroche}</p>
+		<div class="intro__texte">
+			{paragraphes.map((paragraphe) => <p>{paragraphe}</p>)}
+		</div>
+	</div>
+</section>
+
+<style>
+	.intro {
+		display: grid;
+		gap: var(--e-6);
+	}
+
+	.intro__accroche {
+		font-family: var(--f-titre);
+		font-size: var(--t-3);
+		line-height: 1.25;
+	}
+
+	.intro__texte {
+		display: grid;
+		align-content: start;
+		gap: var(--e-4);
+		color: var(--c-encre-douce);
+	}
+
+	@media (min-width: 64rem) {
+		.intro {
+			grid-template-columns: 1fr 1fr;
+			column-gap: var(--e-8);
+		}
+	}
+</style>

@@ -1,0 +1,300 @@
+/*
+ * Palmæ — design system
+ * Dérivé du logo : noir sur blanc cassé, serif Didone pour les titres,
+ * sans-serif fin pour le texte. Le vert vient des photos, pas de l'interface.
+ */
+
+:root {
+	/* Couleurs */
+	--c-fond: #f6f5f1;
+	--c-fond-alt: #edebe4;
+	--c-encre: #111111;
+	--c-encre-douce: #55544f;
+	--c-trait: #d8d5cc;
+	--c-inverse: #f6f5f1;
+	--c-inverse-doux: #a8a69e;
+	--c-trait-inverse: #33332f;
+	--c-champ: #fffefb;
+	--c-erreur: #9b2c2c;
+
+	/* Typographies (variables fournies par <Font /> dans BaseLayout) */
+	--f-titre: var(--font-bodoni);
+	--f-texte: var(--font-jost);
+
+	/* Échelle typographique fluide, de 360 px à 1440 px de large */
+	--t--1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+	--t-0: clamp(1rem, 0.97rem + 0.14vw, 1.0625rem);
+	--t-1: clamp(1.1875rem, 1.1rem + 0.37vw, 1.4375rem);
+	--t-2: clamp(1.4375rem, 1.27rem + 0.74vw, 1.9375rem);
+	--t-3: clamp(1.75rem, 1.45rem + 1.3vw, 2.625rem);
+	--t-4: clamp(2.125rem, 1.6rem + 2.3vw, 3.75rem);
+	--t-5: clamp(2.625rem, 1.7rem + 4vw, 5.5rem);
+
+	/* Espacements */
+	--e-1: 0.25rem;
+	--e-2: 0.5rem;
+	--e-3: 0.75rem;
+	--e-4: 1rem;
+	--e-5: 1.5rem;
+	--e-6: 2rem;
+	--e-7: 3rem;
+	--e-8: 4rem;
+	--e-9: 6rem;
+	--e-section: clamp(4rem, 3rem + 5vw, 8rem);
+
+	/* Mise en page */
+	--l-max: 80rem;
+	--l-texte: 42rem;
+	--l-gouttiere: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+	--hauteur-entete: 4.5rem;
+
+	--transition: 200ms ease;
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+* {
+	margin: 0;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+	scroll-padding-top: var(--hauteur-entete);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100svh;
+	background: var(--c-fond);
+	color: var(--c-encre);
+	font-family: var(--f-texte);
+	font-size: var(--t-0);
+	font-weight: 400;
+	line-height: 1.65;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+main {
+	flex: 1;
+}
+
+img,
+picture,
+svg,
+video {
+	display: block;
+	max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+	font: inherit;
+	color: inherit;
+}
+
+p,
+li,
+figcaption {
+	text-wrap: pretty;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--f-titre);
+	font-weight: 400;
+	line-height: 1.1;
+	letter-spacing: -0.01em;
+	text-wrap: balance;
+}
+
+h1 {
+	font-size: var(--t-5);
+}
+
+h2 {
+	font-size: var(--t-4);
+}
+
+h3 {
+	font-size: var(--t-2);
+}
+
+h4 {
+	font-size: var(--t-1);
+}
+
+a {
+	color: inherit;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 3px;
+}
+
+::selection {
+	background: var(--c-encre);
+	color: var(--c-fond);
+}
+
+/* ---------- Thème sombre local (pied de page, sections inversées) ---------- */
+
+.theme-sombre {
+	background: var(--c-encre);
+	color: var(--c-inverse);
+}
+
+.theme-sombre ::selection {
+	background: var(--c-inverse);
+	color: var(--c-encre);
+}
+
+/* ---------- Mise en page ---------- */
+
+.conteneur {
+	width: min(100% - 2 * var(--l-gouttiere), var(--l-max));
+	margin-inline: auto;
+}
+
+.conteneur-texte {
+	max-width: var(--l-texte);
+}
+
+.section {
+	padding-block: var(--e-section);
+}
+
+.section--alt {
+	background: var(--c-fond-alt);
+}
+
+/* ---------- Typographie utilitaire ---------- */
+
+/* Reprend la ligne « CONCEPTION - REALISATION - ENTRETIEN » du logo */
+.surtitre {
+	font-family: var(--f-texte);
+	font-size: var(--t--1);
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	line-height: 1.4;
+	text-transform: uppercase;
+}
+
+.chapeau {
+	font-size: var(--t-1);
+	font-weight: 300;
+	line-height: 1.5;
+	color: var(--c-encre-douce);
+}
+
+.theme-sombre .chapeau {
+	color: var(--c-inverse-doux);
+}
+
+/* ---------- Boutons ---------- */
+
+.bouton {
+	--b-fond: var(--c-encre);
+	--b-texte: var(--c-fond);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--e-2);
+	min-height: 3rem;
+	padding: 0.75rem 1.75rem;
+	border: 1px solid var(--b-fond);
+	background: var(--b-fond);
+	color: var(--b-texte);
+	font-family: var(--f-texte);
+	font-size: var(--t--1);
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	line-height: 1.2;
+	text-align: center;
+	text-decoration: none;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition:
+		background-color var(--transition),
+		color var(--transition);
+}
+
+.theme-sombre .bouton {
+	--b-fond: var(--c-inverse);
+	--b-texte: var(--c-encre);
+}
+
+.bouton:hover {
+	background: transparent;
+	color: var(--b-fond);
+}
+
+.bouton--contour {
+	background: transparent;
+	color: var(--b-fond);
+}
+
+.bouton--contour:hover {
+	background: var(--b-fond);
+	color: var(--b-texte);
+}
+
+/* ---------- Accessibilité ---------- */
+
+.visuellement-cache {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+.lien-evitement {
+	position: absolute;
+	top: var(--e-2);
+	left: var(--e-2);
+	z-index: 100;
+	padding: var(--e-3) var(--e-5);
+	background: var(--c-encre);
+	color: var(--c-fond);
+	font-size: var(--t--1);
+	text-decoration: none;
+	transform: translateY(-200%);
+}
+
+.lien-evitement:focus {
+	transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}

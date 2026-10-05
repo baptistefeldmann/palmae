@@ -1,0 +1,64 @@
+---
+import AppelDevis from '../components/AppelDevis.astro';
+import EnTetePage from '../components/EnTetePage.astro';
+import Etapes from '../components/Etapes.astro';
+import Faq from '../components/Faq.astro';
+import Introduction from '../components/Introduction.astro';
+import ListePrestations from '../components/ListePrestations.astro';
+import PlanEsquisse from '../components/PlanEsquisse.astro';
+import ProjetsLies from '../components/ProjetsLies.astro';
+import photo from '../assets/photos/conception.jpg';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { lorem } from '../lib/lorem';
+
+// Contenus provisoires : titres réels, textes en lorem ipsum
+const prestations = [
+	{ titre: 'Relevé du terrain', texte: lorem(2, 0) },
+	{ titre: 'Diagnostic du site', texte: lorem(2, 2) },
+	{ titre: 'Esquisse', texte: lorem(2, 4) },
+	{ titre: "Plan d'aménagement", texte: lorem(2, 6) },
+	{ titre: 'Palette végétale', texte: lorem(2, 8) },
+	{ titre: 'Estimation des travaux', texte: lorem(2, 10) },
+];
+
+const etapes = [
+	{ titre: 'Rencontre', texte: lorem(2, 1) },
+	{ titre: 'Relevé et diagnostic', texte: lorem(2, 3) },
+	{ titre: 'Esquisse', texte: lorem(2, 5) },
+	{ titre: 'Projet définitif', texte: lorem(2, 7) },
+];
+
+const questions = [
+	{ question: "Combien de temps dure l'étude ?", reponse: lorem(3, 0) },
+	{ question: 'Puis-je réaliser les travaux moi-même ?', reponse: lorem(3, 3) },
+	{ question: 'Quels documents dois-je fournir ?', reponse: lorem(3, 6) },
+];
+---
+
+<BaseLayout
+	titre="Conception de jardins"
+	description="Étude de terrain, esquisse, plan d'aménagement et palette végétale pour votre jardin à La Réunion."
+>
+	<EnTetePage
+		surtitre="Conception"
+		titre="Imaginer le jardin <em>avant</em> de le planter"
+		chapeau={lorem(2, 0)}
+		image={photo}
+		imageAlt="Plan de plantation coloré dessiné à la main"
+	/>
+
+	<Introduction accroche={lorem(2, 4)} paragraphes={[lorem(4, 0), lorem(4, 5)]} />
+
+	<section class="section section--alt">
+		<div class="conteneur">
+			<PlanEsquisse />
+		</div>
+	</section>
+
+	<ListePrestations surtitre="L'étude" titre="Ce que comprend la conception" elements={prestations} />
+	<Etapes titre="De la première visite au plan définitif" etapes={etapes} />
+	<ProjetsLies prestation="conception" titre="Jardins dessinés par Palmæ" />
+	<Faq questions={questions} />
+	<AppelDevis prestation="conception" titre="Votre jardin commence par un dessin" />
+</BaseLayout>
+

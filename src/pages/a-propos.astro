@@ -1,0 +1,345 @@
+---
+import AppelDevis from '../components/AppelDevis.astro';
+import EnTetePage from '../components/EnTetePage.astro';
+import Introduction from '../components/Introduction.astro';
+import photo from '../assets/photos/a-propos.jpg';
+import { site } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Textes provisoires rédigés pour la maquette ; la partie « Le paysagiste » s'appuie sur le CV d'Antoine Feldmann
+const valeurs = [
+	{
+		titre: 'Partir du lieu',
+		texte:
+			"Avant de dessiner, nous écoutons le terrain : sa pente, son sol, son altitude, la course du soleil et le chemin de l'eau. À La Réunion, deux jardins séparés de quelques kilomètres peuvent vivre sous deux climats différents.",
+	},
+	{
+		titre: 'Le vivant d’abord',
+		texte:
+			"Nous privilégions les plantes indigènes et endémiques de l'île, adaptées au climat et précieuses pour la biodiversité, et nous écartons les espèces envahissantes qui menacent les milieux naturels.",
+	},
+	{
+		titre: 'Une seule main, du croquis au chantier',
+		texte:
+			"Celui qui dessine votre jardin suit aussi sa réalisation. Les intentions de l'esquisse ne se perdent pas en chemin, et chaque détail trouve sa place sur le terrain.",
+	},
+	{
+		titre: 'Des jardins sobres et durables',
+		texte:
+			"Moins d'arrosage, moins d'intrants, des sols vivants et des végétaux qui résistent aux cyclones : un beau jardin est d'abord un jardin qui dure sans s'épuiser.",
+	},
+];
+
+const parcours = [
+	{ periode: '2008 – 2010', titre: 'BTS Aménagements paysagers', lieu: 'Lycée agricole Le Fresne, Angers' },
+	{
+		periode: '2010 – 2015',
+		titre: 'Ingénieur paysagiste concepteur',
+		lieu: 'École nationale supérieure de la nature et du paysage, Blois',
+	},
+	{
+		periode: '2011 – 2014',
+		titre: 'Stages en jardins botaniques et en agences',
+		lieu: 'Arboretum de Trompenburg (Rotterdam), jardin botanique national de Pretoria, agences de paysage',
+	},
+	{
+		periode: '2015 – 2016',
+		titre: 'Master Dynamique des milieux et des risques',
+		lieu: 'Université Paris 1 Panthéon-Sorbonne',
+	},
+	{
+		periode: '2015 – 2022',
+		titre: 'Paysagiste concepteur et urbaniste',
+		lieu: 'Espaces publics, sites naturels et projets urbains, en Île-de-France, en Bretagne et dans la région nantaise',
+	},
+	{ periode: '2017', titre: 'Paysagiste-jardinier', lieu: 'Réalisation et entretien de parcs et jardins, en Vendée' },
+	{ periode: '2017 – 2018', titre: 'Master Villes et territoires', lieu: "École nationale supérieure d'architecture de Nantes" },
+	{
+		periode: 'Depuis 2022',
+		titre: 'Paysagiste concepteur à La Réunion',
+		lieu: 'Projets de paysage à La Réunion, à Maurice et à Mayotte',
+	},
+];
+---
+
+<BaseLayout
+	titre="À propos"
+	description="Palmæ, atelier de paysage à La Réunion fondé par Antoine Feldmann, paysagiste concepteur."
+>
+	<EnTetePage
+		surtitre="À propos"
+		titre="Un atelier de paysage <em>né de l'île</em>"
+		chapeau="Palmæ conçoit, réalise et entretient des jardins à La Réunion, du littoral aux Hauts, avec une conviction : un jardin réussi ressemble d'abord à son lieu."
+		image={photo}
+		imageAlt="Paysage des Hauts de La Réunion, au-dessus d'une mer de nuages"
+	/>
+
+	<Introduction
+		accroche="Palmae est l'ancien nom botanique de la famille des palmiers. Nous l'avons choisi pour ce qu'il raconte : des plantes qui plient sous le vent sans rompre."
+		paragraphes={[
+			"Palmæ est un atelier de paysage installé à Saint-Denis. Nous accompagnons les particuliers, les copropriétés et les professionnels dans la création de leurs jardins et de leurs extérieurs, de la première esquisse aux saisons qui suivent la plantation.",
+			"Notre approche tient en trois métiers, qui sont en réalité un seul : concevoir un jardin juste pour son climat, le réaliser avec soin, puis l'entretenir pour qu'il gagne en beauté avec les années. Parce que nous suivons chaque projet de bout en bout, nous savons ce qu'un dessin devient sur le terrain, et ce qu'un jardin devient avec le temps.",
+		]}
+	/>
+
+	<section class="section section--alt">
+		<div class="conteneur">
+			<p class="surtitre">Nos valeurs</p>
+			<h2 class="valeurs__titre">Ce qui guide chaque projet</h2>
+			<ol class="valeurs">
+				{
+					valeurs.map((valeur, i) => (
+						<li>
+							<span class="valeurs__numero" aria-hidden="true">
+								{String(i + 1).padStart(2, '0')}
+							</span>
+							<h3>{valeur.titre}</h3>
+							<p>{valeur.texte}</p>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="conteneur paysagiste">
+			<div class="paysagiste__portrait" role="img" aria-label="Portrait à venir">
+				<span aria-hidden="true">AF</span>
+				<p class="surtitre">Portrait à venir</p>
+			</div>
+			<div class="paysagiste__texte">
+				<p class="surtitre">Le paysagiste</p>
+				<h2>Antoine Feldmann</h2>
+				<p class="chapeau">Paysagiste concepteur et urbaniste qualifié OPQU, fondateur de Palmæ.</p>
+				<p>
+					Diplômé de l'École nationale supérieure de la nature et du paysage de Blois, Antoine a passé plus de
+					huit ans à concevoir et à suivre des projets de paysage : jardins, parcs, promenades, fronts de mer,
+					sites naturels et espaces publics, en métropole puis à La Réunion, où il vit et travaille depuis 2022.
+				</p>
+				<p>
+					Son regard s'est formé au contact du vivant : une formation de technicien en aménagements paysagers,
+					des stages dans les jardins botaniques de Pretoria et de Rotterdam, une saison de paysagiste-jardinier,
+					une mission contre la désertification au Burkina Faso. Il en a gardé le goût du geste juste et du
+					terrain.
+				</p>
+				<p>
+					Spécialiste des territoires tropicaux, il conçoit des jardins pensés pour le climat de l'île : ombre et
+					fraîcheur, gestion des eaux de pluie, choix de végétaux indigènes, résistance aux cyclones. Il suit
+					lui-même les chantiers, pour que chaque intention du dessin se retrouve dans le jardin.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="section section--alt">
+		<div class="conteneur parcours">
+			<div>
+				<p class="surtitre">Parcours</p>
+				<h2 class="parcours__titre">Formation et expériences</h2>
+			</div>
+			<ol class="parcours__liste">
+				{
+					parcours.map((etape) => (
+						<li>
+							<p class="parcours__periode">{etape.periode}</p>
+							<div>
+								<h3>{etape.titre}</h3>
+								<p>{etape.lieu}</p>
+							</div>
+						</li>
+					))
+				}
+			</ol>
+			<div class="parcours__distinctions">
+				<h3 class="surtitre">Distinctions et publications</h3>
+				<ul>
+					<li>Chronique « Planète environnement », France Inter : comment lutter contre l'érosion du littoral ?</li>
+					<li>Appel à idées « Imaginer le littoral de demain »</li>
+					<li>Contribution aux Cahiers de l'École de Blois n° 13, « Le paysage — mouvement » (ouvrage collectif)</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="conteneur zone">
+			<p class="surtitre">Zone d'intervention</p>
+			<h2>{site.zone}</h2>
+			<p class="chapeau">
+				Du Nord à l'Est, du littoral de l'Ouest aux Hauts du Sud, jusque dans les cirques : nous intervenons dans
+				les 24 communes de l'île.
+			</p>
+		</div>
+	</section>
+
+	<AppelDevis />
+</BaseLayout>
+
+<style>
+	/* ---------- Valeurs ---------- */
+
+	.valeurs__titre {
+		margin-top: var(--e-4);
+		max-width: 18ch;
+	}
+
+	.valeurs {
+		display: grid;
+		gap: var(--e-7);
+		margin-top: var(--e-8);
+		padding: 0;
+		list-style: none;
+	}
+
+	.valeurs li {
+		display: grid;
+		gap: var(--e-3);
+		align-content: start;
+		padding-top: var(--e-5);
+		border-top: 1px solid var(--c-encre);
+	}
+
+	.valeurs__numero {
+		font-family: var(--f-titre);
+		font-size: var(--t-1);
+		font-style: italic;
+	}
+
+	.valeurs p {
+		color: var(--c-encre-douce);
+	}
+
+	@media (min-width: 48rem) {
+		.valeurs {
+			grid-template-columns: repeat(2, 1fr);
+			column-gap: var(--e-7);
+		}
+	}
+
+	@media (min-width: 80rem) {
+		.valeurs {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+
+	/* ---------- Le paysagiste ---------- */
+
+	.paysagiste {
+		display: grid;
+		gap: var(--e-7);
+	}
+
+	.paysagiste__portrait {
+		display: grid;
+		place-content: center;
+		justify-items: center;
+		gap: var(--e-3);
+		aspect-ratio: 4 / 5;
+		background: var(--c-fond-alt);
+		color: var(--c-encre-douce);
+	}
+
+	.paysagiste__portrait span {
+		font-family: var(--f-titre);
+		font-size: var(--t-5);
+		font-style: italic;
+		line-height: 1;
+	}
+
+	.paysagiste__texte {
+		display: grid;
+		gap: var(--e-4);
+		align-content: start;
+	}
+
+	.paysagiste__texte p:not(.surtitre, .chapeau) {
+		max-width: var(--l-texte);
+	}
+
+	@media (min-width: 64rem) {
+		.paysagiste {
+			grid-template-columns: 1fr 1.4fr;
+			column-gap: var(--e-9);
+			align-items: start;
+		}
+	}
+
+	/* ---------- Parcours ---------- */
+
+	.parcours {
+		display: grid;
+		gap: var(--e-7);
+	}
+
+	.parcours__titre {
+		margin-top: var(--e-4);
+	}
+
+	.parcours__liste {
+		padding: 0;
+		list-style: none;
+		border-top: 1px solid var(--c-encre);
+	}
+
+	.parcours__liste li {
+		display: grid;
+		gap: var(--e-2) var(--e-6);
+		padding-block: var(--e-4);
+		border-bottom: 1px solid var(--c-trait);
+	}
+
+	.parcours__periode {
+		font-family: var(--f-titre);
+		font-style: italic;
+		color: var(--c-encre-douce);
+	}
+
+	.parcours__liste h3 {
+		font-family: var(--f-texte);
+		font-size: var(--t-0);
+		font-weight: 500;
+		line-height: 1.4;
+	}
+
+	.parcours__liste li p:last-child {
+		color: var(--c-encre-douce);
+	}
+
+	.parcours__distinctions ul {
+		display: grid;
+		gap: var(--e-3);
+		margin-top: var(--e-4);
+		padding-left: 1.1em;
+		color: var(--c-encre-douce);
+	}
+
+	@media (min-width: 40rem) {
+		.parcours__liste li {
+			grid-template-columns: 9rem 1fr;
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.parcours {
+			grid-template-columns: 1fr 2fr;
+			column-gap: var(--e-8);
+		}
+
+		.parcours__distinctions {
+			grid-column: 2;
+		}
+	}
+
+	/* ---------- Zone ---------- */
+
+	.zone {
+		display: grid;
+		gap: var(--e-4);
+		justify-items: start;
+	}
+
+	.zone .chapeau {
+		max-width: 40rem;
+	}
+</style>

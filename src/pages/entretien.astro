@@ -1,0 +1,120 @@
+---
+import AppelDevis from '../components/AppelDevis.astro';
+import EnTetePage from '../components/EnTetePage.astro';
+import Faq from '../components/Faq.astro';
+import Introduction from '../components/Introduction.astro';
+import ListePrestations from '../components/ListePrestations.astro';
+import ProjetsLies from '../components/ProjetsLies.astro';
+import photo from '../assets/photos/entretien.jpg';
+import { options } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { lorem } from '../lib/lorem';
+
+// Contenus provisoires : titres réels, textes en lorem ipsum
+const prestations = [
+	{ titre: 'Taille et élagage', texte: lorem(2, 0) },
+	{ titre: 'Tonte et débroussaillage', texte: lorem(2, 2) },
+	{ titre: 'Soin des végétaux', texte: lorem(2, 4) },
+	{ titre: 'Préparation de la saison cyclonique', texte: lorem(2, 6) },
+	{ titre: 'Suivi de l’arrosage', texte: lorem(2, 8) },
+	{ titre: 'Évacuation des déchets verts', texte: lorem(2, 10) },
+];
+
+const formules = [
+	{ nom: 'Contrat annuel', resume: 'Des passages réguliers, toute l’année', texte: lorem(3, 1) },
+	{ nom: 'Intervention ponctuelle', resume: 'Une remise en état, un besoin précis', texte: lorem(3, 5) },
+];
+
+const questions = [
+	{ question: 'À quelle fréquence faut-il entretenir un jardin ?', reponse: lorem(3, 2) },
+	{ question: 'Que faites-vous des déchets verts ?', reponse: lorem(3, 5) },
+	{ question: 'Intervenez-vous avant un cyclone ?', reponse: lorem(3, 8) },
+];
+---
+
+<BaseLayout
+	titre="Entretien de jardins"
+	description="Taille, tonte, soin des végétaux et préparation de la saison cyclonique : l'entretien de votre jardin à La Réunion."
+>
+	<EnTetePage
+		surtitre="Entretien"
+		titre="Faire <em>durer</em> le jardin"
+		chapeau={lorem(2, 4)}
+		image={photo}
+		imageAlt="Sécateur en train de tailler un rameau feuillu"
+	/>
+
+	<Introduction accroche={lorem(2, 8)} paragraphes={[lorem(4, 4), lorem(4, 9)]} />
+	<ListePrestations surtitre="Au fil des saisons" titre="Ce que comprend l'entretien" elements={prestations} />
+
+	<section class="section section--alt">
+		<div class="conteneur">
+			<p class="surtitre">Formules</p>
+			<h2 class="formules__titre">Deux façons de nous confier votre jardin</h2>
+			<div class="formules">
+				{
+					formules.map((formule) => (
+						<article class="formule">
+							<h3>{formule.nom}</h3>
+							<p class="formule__resume">{formule.resume}</p>
+							<p>{formule.texte}</p>
+						</article>
+					))
+				}
+			</div>
+			{
+				options.servicesALaPersonne && (
+					<p class="formules__credit">
+						Entretien éligible au crédit d'impôt de 50 % au titre des services à la personne.
+					</p>
+				)
+			}
+		</div>
+	</section>
+
+	<ProjetsLies prestation="entretien" titre="Jardins entretenus par Palmæ" />
+	<Faq questions={questions} />
+	<AppelDevis prestation="entretien" titre="Confiez-nous votre jardin" />
+</BaseLayout>
+
+<style>
+	.formules__titre {
+		margin-top: var(--e-4);
+		max-width: 20ch;
+	}
+
+	.formules {
+		display: grid;
+		gap: var(--e-5);
+		margin-top: var(--e-7);
+	}
+
+	.formule {
+		display: grid;
+		gap: var(--e-3);
+		align-content: start;
+		padding: var(--e-6);
+		background: var(--c-fond);
+	}
+
+	.formule__resume {
+		font-family: var(--f-titre);
+		font-size: var(--t-1);
+		font-style: italic;
+	}
+
+	.formule p:last-child {
+		color: var(--c-encre-douce);
+	}
+
+	.formules__credit {
+		margin-top: var(--e-6);
+		font-weight: 500;
+	}
+
+	@media (min-width: 48rem) {
+		.formules {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+</style>

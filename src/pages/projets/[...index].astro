@@ -1,0 +1,80 @@
+---
+/**
+ * Page /projets. Route en paramètre « rest » pour ne générer la page
+ * que lorsqu'il y a assez de projets publiés (voir SEUIL_PROJETS).
+ */
+import AppelDevis from '../../components/AppelDevis.astro';
+import CarteProjet from '../../components/CarteProjet.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { afficherProjets, getProjets } from '../../lib/projets';
+
+export async function getStaticPaths() {
+	return (await afficherProjets()) ? [{ params: { index: undefined } }] : [];
+}
+
+const projets = await getProjets();
+const aLaUne = projets.find((projet) => projet.data.aLaUne) ?? projets[0];
+const autres = projets.filter((projet) => projet !== aLaUne);
+---
+
+<BaseLayout
+	titre="Projets"
+	description="Jardins conçus, réalisés et entretenus par Palmæ à La Réunion, du littoral aux Hauts."
+>
+	<header class="conteneur entete-projets">
+		<p class="surtitre">Projets</p>
+		<h1>Chaque jardin porte <em>un nom</em></h1>
+		<p class="chapeau">
+			Celui d'une plante, d'un vent, d'un souvenir. Un nom qui dit ce que le lieu avait déjà en lui, et que le
+			projet a révélé.
+		</p>
+	</header>
+
+	<section class="conteneur projets" aria-label="Tous les projets">
+		<CarteProjet projet={aLaUne} format="large" niveauTitre="h2" />
+		<div class="projets__grille">
+			{autres.map((projet) => <CarteProjet projet={projet} niveauTitre="h2" />)}
+		</div>
+	</section>
+
+	<AppelDevis titre="Et votre jardin, quel sera son nom ?" />
+</BaseLayout>
+
+<style>
+	.entete-projets {
+		display: grid;
+		gap: var(--e-5);
+		padding-block: var(--e-8) var(--e-7);
+	}
+
+	.entete-projets h1 {
+		max-width: 14ch;
+	}
+
+	.entete-projets .chapeau {
+		max-width: 34rem;
+	}
+
+	.projets {
+		display: grid;
+		gap: var(--e-9);
+		padding-bottom: var(--e-section);
+	}
+
+	.projets__grille {
+		display: grid;
+		gap: var(--e-8);
+	}
+
+	@media (min-width: 48rem) {
+		.projets__grille {
+			grid-template-columns: repeat(2, 1fr);
+			column-gap: var(--e-7);
+		}
+
+		/* Colonne de droite décalée : rythme en quinconce */
+		.projets__grille > :global(:nth-child(even)) {
+			margin-top: var(--e-9);
+		}
+	}
+</style>

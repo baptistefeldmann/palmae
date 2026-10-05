@@ -1,0 +1,42 @@
+---
+import { site } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { lien } from '../../lib/liens';
+
+const { telephone } = site.contact;
+---
+
+<BaseLayout titre="Demande envoyée" description="Votre demande de devis a bien été envoyée à Palmæ.">
+	<section class="section">
+		<div class="conteneur conteneur-texte merci">
+			<p class="surtitre">Demande envoyée</p>
+			<h1>Merci, votre demande est <em>bien partie</em></h1>
+			<p class="chapeau">
+				Nous l'étudions avec attention et vous rappelons sous 48 heures ouvrées pour en parler. Un e-mail de
+				confirmation vient de vous être envoyé.
+			</p>
+			<p>
+				Une question d'ici là ? Appelez-nous au <a href={`tel:${telephone.lien}`}>{telephone.affichage}</a>.
+			</p>
+			<div class="merci__actions">
+				<a class="bouton" href={lien('/')}>Retour à l'accueil</a>
+				<a class="bouton bouton--contour" href={lien('/conception')}>Découvrir nos métiers</a>
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.merci {
+		display: grid;
+		gap: var(--e-5);
+		padding-block: var(--e-6);
+	}
+
+	.merci__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--e-3);
+		margin-top: var(--e-4);
+	}
+</style>

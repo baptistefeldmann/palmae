@@ -1,0 +1,189 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo/palmae-logo.png';
+import { metiers, site } from '../config/site';
+import { afficherProjets } from '../lib/projets';
+import { lien } from '../lib/liens';
+
+const avecProjets = await afficherProjets();
+const { telephone, email } = site.contact;
+const reseaux = [
+	{ nom: 'Instagram', url: site.reseaux.instagram },
+	{ nom: 'Facebook', url: site.reseaux.facebook },
+].filter((reseau) => reseau.url);
+const annee = new Date().getFullYear();
+---
+
+<footer class="pied theme-sombre">
+	<div class="conteneur pied__grille">
+		<div class="pied__marque">
+			<Image src={logo} alt={`${site.nom} — ${site.accroche}`} width={200} class="pied__logo" />
+			<p class="surtitre">Conception · Réalisation · Entretien</p>
+		</div>
+
+		<div>
+			<h2 class="pied__titre">Savoir-faire</h2>
+			<ul class="pied__liste">
+				{
+					metiers.map((metier) => (
+						<li>
+							<a href={lien(metier.href)}>{metier.titre}</a>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+
+		<div>
+			<h2 class="pied__titre">{site.nom}</h2>
+			<ul class="pied__liste">
+				{
+					avecProjets && (
+						<li>
+							<a href={lien('/projets')}>Projets</a>
+						</li>
+					)
+				}
+				<li><a href={lien('/a-propos')}>À propos</a></li>
+				<li><a href={lien('/devis')}>Demander un devis</a></li>
+			</ul>
+		</div>
+
+		<div>
+			<h2 class="pied__titre">Contact</h2>
+			<address class="pied__liste">
+				<a href={`tel:${telephone.lien}`}>{telephone.affichage}</a>
+				<a href={`mailto:${email}`}>{email}</a>
+				<span>{site.zone}</span>
+			</address>
+			{
+				reseaux.length > 0 && (
+					<ul class="pied__liste pied__reseaux">
+						{reseaux.map((reseau) => (
+							<li>
+								<a href={reseau.url} rel="noopener">
+									{reseau.nom}
+								</a>
+							</li>
+						))}
+					</ul>
+				)
+			}
+		</div>
+	</div>
+
+	<div class="conteneur pied__bas">
+		<p>© {annee} {site.nom}</p>
+		<ul>
+			<li><a href={lien('/mentions-legales')}>Mentions légales</a></li>
+			<li><a href={lien('/confidentialite')}>Confidentialité</a></li>
+		</ul>
+	</div>
+</footer>
+
+<style>
+	.pied {
+		padding-top: var(--e-9);
+		font-size: var(--t--1);
+	}
+
+	.pied__grille {
+		display: grid;
+		gap: var(--e-7);
+		padding-bottom: var(--e-8);
+	}
+
+	.pied__marque {
+		display: grid;
+		align-content: start;
+		gap: var(--e-5);
+		justify-items: start;
+	}
+
+	/* Le logo est noir sur transparent : on l'inverse pour le fond sombre */
+	.pied__logo {
+		filter: invert(1);
+	}
+
+	.pied__marque .surtitre {
+		color: var(--c-inverse-doux);
+	}
+
+	.pied__titre {
+		margin-bottom: var(--e-4);
+		font-family: var(--f-texte);
+		font-size: var(--t--1);
+		font-weight: 500;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+	}
+
+	.pied__liste {
+		display: grid;
+		gap: var(--e-2);
+		padding: 0;
+		font-style: normal;
+		list-style: none;
+		color: var(--c-inverse-doux);
+	}
+
+	.pied__liste a {
+		text-decoration: none;
+		transition: color var(--transition);
+	}
+
+	.pied__liste a:hover {
+		color: var(--c-inverse);
+		text-decoration: underline;
+	}
+
+	.pied__reseaux {
+		margin-top: var(--e-4);
+	}
+
+	.pied__bas {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: var(--e-3) var(--e-6);
+		padding-block: var(--e-5);
+		border-top: 1px solid var(--c-trait-inverse);
+		color: var(--c-inverse-doux);
+	}
+
+	.pied__bas ul {
+		display: flex;
+		gap: var(--e-5);
+		padding: 0;
+		list-style: none;
+	}
+
+	.pied__bas a {
+		text-decoration: none;
+	}
+
+	.pied__bas a:hover {
+		color: var(--c-inverse);
+		text-decoration: underline;
+	}
+
+	@media (min-width: 40rem) {
+		.pied__grille {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		.pied__marque {
+			grid-column: 1 / -1;
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.pied__grille {
+			grid-template-columns: 2fr 1fr 1fr 1.25fr;
+		}
+
+		.pied__marque {
+			grid-column: auto;
+		}
+	}
+</style>

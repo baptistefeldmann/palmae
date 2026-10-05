@@ -1,0 +1,110 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { lien } from '../lib/liens';
+
+interface Props {
+	projet: CollectionEntry<'projets'>;
+	/** `large` : carte à la une, sur toute la largeur */
+	format?: 'normal' | 'large';
+	niveauTitre?: 'h2' | 'h3';
+}
+
+const { projet, format = 'normal', niveauTitre: Titre = 'h3' } = Astro.props;
+const { titre, sousTitre, commune, date, couverture, couvertureAlt } = projet.data;
+const large = format === 'large';
+---
+
+<article class:list={['carte', { 'carte--large': large }]}>
+	<a href={lien(`/projets/${projet.id}`)} class="carte__lien">
+		<div class="carte__image">
+			<Image
+				src={couverture}
+				alt={couvertureAlt}
+				width={large ? 1600 : 960}
+				height={large ? 800 : 720}
+				sizes={large ? '(min-width: 80rem) 80rem, 100vw' : '(min-width: 64rem) 40rem, 100vw'}
+			/>
+		</div>
+		<div class="carte__texte">
+			<p class="surtitre carte__lieu">{commune} · {date.getFullYear()}</p>
+			<Titre class="carte__titre">{titre}</Titre>
+			<p class="carte__sous-titre">{sousTitre}</p>
+		</div>
+	</a>
+</article>
+
+<style>
+	.carte__lien {
+		display: grid;
+		gap: var(--e-5);
+		text-decoration: none;
+	}
+
+	.carte__image {
+		overflow: hidden;
+		background: var(--c-fond-alt);
+	}
+
+	.carte__image img {
+		width: 100%;
+		height: auto;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+		transition: transform 600ms ease;
+	}
+
+	.carte--large .carte__image img {
+		aspect-ratio: 4 / 3;
+	}
+
+	.carte__lien:hover img {
+		transform: scale(1.03);
+	}
+
+	.carte__texte {
+		display: grid;
+		gap: var(--e-2);
+	}
+
+	.carte__lieu {
+		color: var(--c-encre-douce);
+	}
+
+	.carte__titre {
+		font-size: var(--t-3);
+	}
+
+	.carte--large .carte__titre {
+		font-size: var(--t-5);
+	}
+
+	.carte__sous-titre {
+		color: var(--c-encre-douce);
+	}
+
+	.carte__lien:hover .carte__titre {
+		font-style: italic;
+	}
+
+	@media (min-width: 48rem) {
+		.carte--large .carte__image img {
+			aspect-ratio: 2 / 1;
+		}
+
+		.carte--large .carte__texte {
+			grid-template-columns: 1fr 1fr;
+			align-items: end;
+			column-gap: var(--e-7);
+		}
+
+		.carte--large .carte__lieu {
+			grid-column: 1 / -1;
+		}
+
+		.carte--large .carte__sous-titre {
+			font-size: var(--t-1);
+			font-weight: 300;
+		}
+	}
+</style>

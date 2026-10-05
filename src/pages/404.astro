@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { lien } from '../lib/liens';
+---
+
+<BaseLayout titre="Page introuvable" description="Cette page n'existe pas ou a été déplacée.">
+	<section class="section">
+		<div class="conteneur conteneur-texte introuvable">
+			<p class="surtitre">Erreur 404</p>
+			<h1>Ce chemin ne mène <em>nulle part</em></h1>
+			<p class="chapeau">La page que vous cherchez n'existe pas, ou pas encore. Le jardin, lui, est par ici.</p>
+			<div class="introuvable__actions">
+				<a class="bouton" href={lien('/')}>Retour à l'accueil</a>
+				<a class="bouton bouton--contour" href={lien('/devis')}>Demander un devis</a>
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.introuvable {
+		display: grid;
+		gap: var(--e-5);
+		padding-block: var(--e-6);
+	}
+
+	.introuvable__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--e-3);
+		margin-top: var(--e-4);
+	}
+</style>

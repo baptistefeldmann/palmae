@@ -1,0 +1,333 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import AppelDevis from '../../components/AppelDevis.astro';
+import AvantApres from '../../components/AvantApres.astro';
+import CarteProjet from '../../components/CarteProjet.astro';
+import Galerie from '../../components/Galerie.astro';
+import { metiers } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getProjets } from '../../lib/projets';
+import { lien } from '../../lib/liens';
+
+export async function getStaticPaths() {
+	const projets = await getProjets();
+	return projets.map((projet, i) => ({
+		params: { slug: projet.id },
+		// Les deux projets suivants, en boucle, pour « Autres jardins »
+		props: { projet, autres: [1, 2].map((d) => projets[(i + d) % projets.length]).filter((p) => p !== projet) },
+	}));
+}
+
+const { projet, autres } = Astro.props;
+const { Content } = await render(projet);
+const d = projet.data;
+
+const nombre = (n: number) => n.toLocaleString('fr-FR');
+const fiche = [
+	{ libelle: 'Commune', valeur: d.commune },
+	d.altitude !== undefined && { libelle: 'Altitude', valeur: `${nombre(d.altitude)} m` },
+	d.surface && { libelle: 'Surface', valeur: `${nombre(d.surface)} m²` },
+	{
+		libelle: 'Prestations',
+		valeur: metiers
+			.filter((m) => d.prestations.includes(m.id))
+			.map((m) => m.titre)
+			.join(', '),
+	},
+	d.duree && { libelle: 'Durée des travaux', valeur: d.duree },
+	{ libelle: 'Année', valeur: String(d.date.getFullYear()) },
+].filter((ligne) => !!ligne);
+---
+
+<BaseLayout titre={`${d.titre}, ${d.sousTitre.charAt(0).toLowerCase()}${d.sousTitre.slice(1)}`} description={d.resume}>
+	<header class="heros">
+		<Image src={d.couverture} alt={d.couvertureAlt} layout="full-width" class="heros__image" priority />
+		<div class="heros__voile"></div>
+		<div class="conteneur heros__texte">
+			<p class="surtitre">{d.commune} · {d.date.getFullYear()}</p>
+			<h1>{d.titre}</h1>
+			<p class="chapeau">{d.sousTitre}</p>
+		</div>
+	</header>
+
+	<section class="section">
+		<div class="conteneur jardin">
+			<aside class="fiche" aria-labelledby="fiche-titre">
+				<h2 id="fiche-titre" class="surtitre">Le jardin</h2>
+				<dl>
+					{
+						fiche.map((ligne) => (
+							<div>
+								<dt>{ligne.libelle}</dt>
+								<dd>{ligne.valeur}</dd>
+							</div>
+						))
+					}
+				</dl>
+				{
+					d.vegetaux.length > 0 && (
+						<div class="fiche__vegetaux">
+							<p class="fiche__libelle">Végétaux</p>
+							<ul>
+								{d.vegetaux.map((v) => (
+									<li>{v}</li>
+								))}
+							</ul>
+						</div>
+					)
+				}
+			</aside>
+			<div class="recit">
+				<Content />
+			</div>
+		</div>
+	</section>
+
+	{
+		d.avantApres.length > 0 && (
+			<section class="section section--alt">
+				<div class="conteneur">
+					<p class="surtitre">Avant, après</p>
+					<h2 class="section__titre">La transformation</h2>
+					<div class="avant-apres-liste">
+						{d.avantApres.map((paire) => (
+							<AvantApres nom={d.titre} {...paire} />
+						))}
+					</div>
+				</div>
+			</section>
+		)
+	}
+
+	{
+		d.galerie.length > 0 && (
+			<section class="section">
+				<div class="conteneur">
+					<p class="surtitre">En images</p>
+					<h2 class="section__titre">Promenade</h2>
+					<Galerie images={d.galerie} />
+				</div>
+			</section>
+		)
+	}
+
+	{
+		d.temoignage && (
+			<section class="section section--alt">
+				<figure class="conteneur temoignage">
+					<blockquote>
+						<p>« {d.temoignage.texte} »</p>
+					</blockquote>
+					<figcaption class="surtitre">{d.temoignage.auteur}</figcaption>
+				</figure>
+			</section>
+		)
+	}
+
+	{
+		autres.length > 0 && (
+			<section class="section">
+				<div class="conteneur">
+					<div class="autres__entete">
+						<h2>Autres jardins</h2>
+						<a class="bouton bouton--contour" href={lien('/projets')}>
+							Tous les projets
+						</a>
+					</div>
+					<div class="autres__grille">
+						{autres.map((autre) => (
+							<CarteProjet projet={autre} />
+						))}
+					</div>
+				</div>
+			</section>
+		)
+	}
+
+	<AppelDevis prestation={d.prestations[0]} titre="Envie d'un jardin qui vous ressemble ?" />
+</BaseLayout>
+
+<style>
+	/* ---------- En-tête plein écran ---------- */
+
+	.heros {
+		position: relative;
+		display: grid;
+		align-items: end;
+		min-height: min(88svh, 56rem);
+		overflow: hidden;
+	}
+
+	.heros__image,
+	.heros__voile {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.heros__image {
+		object-fit: cover;
+	}
+
+	.heros__voile {
+		background: linear-gradient(to top, rgb(0 0 0 / 0.6), rgb(0 0 0 / 0) 60%);
+	}
+
+	.heros__texte {
+		position: relative;
+		display: grid;
+		gap: var(--e-3);
+		padding-block: var(--e-8);
+		color: var(--c-inverse);
+	}
+
+	.heros h1 {
+		font-size: clamp(3.5rem, 2rem + 8vw, 9rem);
+		line-height: 1;
+	}
+
+	.heros .chapeau {
+		color: var(--c-inverse);
+	}
+
+	/* ---------- Fiche et récit ---------- */
+
+	.jardin {
+		display: grid;
+		gap: var(--e-8);
+	}
+
+	.fiche {
+		align-self: start;
+	}
+
+	.fiche dl {
+		margin-top: var(--e-5);
+		border-top: 1px solid var(--c-encre);
+	}
+
+	.fiche dl div {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--e-5);
+		padding-block: var(--e-3);
+		border-bottom: 1px solid var(--c-trait);
+	}
+
+	dt,
+	.fiche__libelle {
+		font-size: var(--t--1);
+		font-weight: 500;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--c-encre-douce);
+	}
+
+	dd {
+		font-family: var(--f-titre);
+		font-size: var(--t-1);
+		line-height: 1.3;
+		text-align: right;
+	}
+
+	.fiche__vegetaux {
+		padding-top: var(--e-4);
+	}
+
+	.fiche__vegetaux ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--e-2);
+		margin-top: var(--e-3);
+		padding: 0;
+		list-style: none;
+	}
+
+	.fiche__vegetaux li {
+		padding: var(--e-1) var(--e-3);
+		border: 1px solid var(--c-trait);
+		font-size: var(--t--1);
+	}
+
+	.recit {
+		display: grid;
+		gap: var(--e-5);
+		max-width: var(--l-texte);
+		font-family: var(--f-titre);
+		font-size: var(--t-1);
+		line-height: 1.6;
+	}
+
+	/* Lettrine sur le premier paragraphe */
+	.recit :global(p:first-child::first-letter) {
+		float: left;
+		margin: 0.08em 0.12em 0 0;
+		font-size: 4.2em;
+		line-height: 0.8;
+	}
+
+	@media (min-width: 64rem) {
+		.jardin {
+			grid-template-columns: 1fr 2fr;
+			column-gap: var(--e-9);
+		}
+
+		.fiche {
+			position: sticky;
+			top: calc(var(--hauteur-entete) + var(--e-6));
+		}
+
+		.recit {
+			grid-column: 2;
+			grid-row: 1;
+		}
+	}
+
+	/* ---------- Sections ---------- */
+
+	.section__titre {
+		margin-block: var(--e-4) var(--e-7);
+	}
+
+	.avant-apres-liste {
+		display: grid;
+		gap: var(--e-8);
+	}
+
+	.temoignage {
+		display: grid;
+		gap: var(--e-5);
+		max-width: 50rem;
+		text-align: center;
+	}
+
+	.temoignage blockquote {
+		font-family: var(--f-titre);
+		font-size: var(--t-3);
+		font-style: italic;
+		line-height: 1.3;
+	}
+
+	.autres__entete {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: end;
+		gap: var(--e-5);
+		margin-bottom: var(--e-7);
+	}
+
+	.autres__grille {
+		display: grid;
+		gap: var(--e-7);
+	}
+
+	@media (min-width: 48rem) {
+		.autres__grille {
+			grid-template-columns: repeat(2, 1fr);
+			column-gap: var(--e-6);
+		}
+	}
+</style>
